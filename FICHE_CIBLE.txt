@@ -1,0 +1,112 @@
+FICHE DE CIBLE - SauceDemo
+=============================
+
+Cible ................. Swag Labs
+URL de depart ......... https://www.saucedemo.com/
+URL de l'inventaire ... https://www.saucedemo.com/inventory.html
+Date d analyse ........ 30/07/2026
+Analyste .............. Aurélie Demure
+
+1. SOURCE
+   Famille de site ......... SPA 
+   Preuve .................. commande : curl -s https://www.saucedemo.com/
+                             résultat observé : 
+              <!DOCTYPE html>
+              <html lang="en">
+              <head>
+                <meta charset="utf-8" />
+                <link rel="icon" href="/favicon.ico" />
+                <meta name="robots" content="noindex">
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta name="theme-color" content="#ffffff" />
+                <meta name="description" content="Sauce Labs Swag Labs app" />
+                <link rel="apple-touch-icon" href="/icon-192x192.png" />
+                <link rel="manifest" href="/manifest.json"/>
+
+                <!-- Single Page Apps for GitHub Pages -->
+                <script type="text/javascript">
+                  // https://github.com/rafgraph/spa-github-pages
+                  (function(l) {
+                    if (l.search[1] === '/' ) {
+                      var decoded = l.search.slice(1).split('&').map(function(s) {
+                        return s.replace(/~and~/g, '&')
+                      }).join('?');
+                      window.history.replaceState(null, null,
+                              l.pathname.slice(0, -1) + decoded + l.hash
+                      );
+                    }
+                  }(window.location))
+                </script>
+
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500">
+                <title>Swag Labs</title>
+                <script type="module" crossorigin src="/assets/index-XyuNVFOR.js"></script>
+                <link rel="stylesheet" crossorigin href="/assets/index-Co7SA-g_.css">
+              </head>
+              <body>
+                <noscript>You need to enable JavaScript to run this app.</noscript>
+                <div id="root"></div>
+              </body>
+              </html>
+                      Justification :  le HTML initial contient un conteneur vide <div id="root"></div>, un script JavaScript de type module (/assets/index-XyuNVFOR.js) et le message « You need to enable JavaScript to run this app ».
+                      Le contenu de l’application est donc construit côté navigateur par JavaScript.
+
+            
+   Fichiers publies ........ robots.txt : oui  les robots sont autorisés à parcourir toutes les pages
+   ..........................sitemap.xml : non
+   Nombre d URLs connues ... 12 URL : page de connexion, inventaire, 6 pages détail, panier et 3 pages de commande
+2. SURFACE PORTEUSE DE LA DONNEE
+   HTML initial ............ non   (marqueur : Sauce Labs Backpack, occurrences : 0)
+   DOM apres JS ............ oui, inventory_item présent dans Eléments
+   Appel reseau ............ aucun appel API observé dans Fetch/XHR après rechargement de la page et désactivation du cache pour les données Product
+   Format de reponse ....... HTML aucune réponse JSON, JSON-LD ou XML pour les données Product
+   Champs disponibles ...... dans le DOM : name, price, description 
+   Couverture du contrat ... champs Product manquants :  currency, url, sort_order
+
+3. TECHNIQUE D ACQUISITION RETENUE
+   Niveau ..................  5 
+   Valeur de source ........ browser
+   Commande de reference ... curl -s https://www.saucedemo.com/inventory.html
+   En-tetes necessaires .... aucun entête HTTP spécifique, authentification requise
+   Pagination .............. aucune
+   Condition d arret ....... arrêt lorsque les 6 produits sont collectés et les 6 pages détail visitées et les 4 ordres de tri relevés
+   Niveaux ecartes ......... Niveau 1 : aucun fichier publié
+                             Niveau 2 : pas d'API publique
+                             Niveau 3 : pas d'API interne
+                             Niveau 4 : produits absents du HTML initial et apparaissent dans le DOM après exécution du JS
+                             Niveau 6 : pas de nécessité de faire appel à un LLM puisque les données sont stables et accessibles
+
+4. COMPLEXITE
+   Estimation .............. M
+   Justification ........... petit catalogue mais nécessité d'automatiser le navigateur, et d'être connecté
+
+5. RISQUES ET CONTRAINTES
+   Techniques .............. Données dépendantes de JavaScript et d’une session
+                             authentifiée,
+                             La structure du DOM et des attributs data-test peuvent être
+                             modifiés lors d'une mise à jour du site,
+                             navigation et panier gérés côté navigateur,
+                             aucune API Product exploitable observée.
+   Juridiques .............. Aucune CGU ni politique de confidentialité trouvée
+                             sur SauceDemo lors du diagnostic. robots.txt présent
+                             avec Disallow vide : le chemin visé n’est pas interdit.
+                             Accès après authentification avec les identifiants de
+                             démonstration publiés par le site. Aucune donnée
+                             personnelle collectée. Collecte limitée à un exercice
+                             d'école portant sur 6 produits. Les descriptions
+                             et les images peuvent être protégées par le droit
+                             d’auteur ; leur réutilisation est acceptable si elle
+                             est limitée au devoir.
+   Charge .................. concurrence max 1 | délai min 500 ms entre deux
+                             actions de navigation en l'absence de délai publié
+                             | sur HTTP 429 : arrêter les
+                             nouvelles requêtes, respecter Retry-After s’il est
+                             présent, s’il est
+                             absent, appliquer un délai progressif, puis abandonner
+                             après plusieurs échecs.
+   Point de rupture ........ Une modification des sélecteurs data-test ou du
+                             parcours d’authentification casserait probablement
+                             la collecte en premier.
+   Repli prevu ............. Niveau 5 dégradé : collecte manuelle dans le
+                             navigateur et export des 6 produits ; coût faible
+                             en infrastructure, mais temps humain plus élevé.
