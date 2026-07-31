@@ -2,7 +2,7 @@ import json
 import re
 from datetime import datetime, timezone
 from urllib.parse import parse_qs, urlparse
-from playwright.sync_api import Page, expect, sync_playwright
+from playwright.sync_api import Locator, Page, expect, sync_playwright
 from config import (
     AVAILABLE_PRODUCTS,
     HEADLESS,
@@ -17,6 +17,23 @@ from config import (
 
 PRODUCTS_PATH = RAW_PRODUCTS_PATH
 DETAILS_PATH = RAW_DETAILS_PATH
+
+
+def require_detail_field(
+    page: Page,
+    test_id: str,
+    field_name: str,
+    product_name: str,
+) -> Locator:
+    field = page.get_by_test_id(test_id)
+
+    if field.count() != 1:
+        raise ValueError(
+            f"Ancrage introuvable pour le champ '{field_name}' "
+            f"de la fiche '{product_name}' : data-test='{test_id}'"
+        )
+
+    return field
 
 
 def load_products() -> list[dict]:
@@ -68,10 +85,27 @@ def extract_product_detail(page: Page, product_name: str) -> dict:
         re.compile(r".*/inventory-item\.html\?id=\d+")
     )
 
+    name_element = require_detail_field(
+        page,
+        "inventory-item-name",
+        "name",
+        product_name,
+    )
+    price_element = require_detail_field(
+        page,
+        "inventory-item-price",
+        "price",
+        product_name,
+    )
+    description_element = require_detail_field(
+        page,
+        "inventory-item-desc",
+        "description",
+        product_name,
+    )
+
     # On vérifie que le contenu principal de la fiche est bien affiché.
-    expect(
-        page.get_by_test_id("inventory-item-name")
-    ).to_be_visible()
+    expect(name_element).to_be_visible()
 
     product_url = page.url
     collected_at = datetime.now(timezone.utc).isoformat()
@@ -80,15 +114,9 @@ def extract_product_detail(page: Page, product_name: str) -> dict:
     # le prix conserve notamment son symbole "$".
     detail = {
         "id": extract_product_id(product_url),
-        "name": page.get_by_test_id(
-            "inventory-item-name"
-        ).inner_text().strip(),
-        "price": page.get_by_test_id(
-            "inventory-item-price"
-        ).inner_text().strip(),
-        "description": page.get_by_test_id(
-            "inventory-item-desc"
-        ).inner_text().strip(),
+        "name": name_element.inner_text().strip(),
+        "price": price_element.inner_text().strip(),
+        "description": description_element.inner_text().strip(),
         # Contrairement au href "#", page.url contient l'URL réelle.
         "url": page.url,
         "collected_at": collected_at,

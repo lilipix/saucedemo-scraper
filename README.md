@@ -1,5 +1,4 @@
-
-# Compte rendu — Projet individuel de web scraping 
+# Compte rendu — Projet individuel de web scraping
 
 ## Informations de remise
 
@@ -15,14 +14,12 @@
 | Hash complet du commit évalué          | **[À COMPLÉTER après le dernier commit]**                                  |
 | Date et heure d’envoi                   | **[À COMPLÉTER]**                                                           |
 | Commande de lancement limité            | **make all**                                                                  |
-| Commande de vérification                | **[À relever dans le README ou le Makefile]**                                |
+| Commande de vérification                | **make validate**                                                             |
 | Lien GitHub testé en navigation privée | **[x]**                                                                       |
 
 ## 1. Résumé exécutif
 
-Le projet Python collecte les six produits constituant l’inventaire complet du site de démonstration Sauce Demo. Il ouvre une session avec les identifiants affichés par le site, puis réutilise l’état authentifié afin d’éviter une nouvelle connexion pour chaque page. La collecte couvre l’inventaire, les six pages de détail et les quatre ordres de tri demandés dans la fiche cible. Les données sont normalisées et validées dans un modèle `Product`, puis écrites dans un fichier JSONL à chaque exécution. La principale difficulté est que les produits ne sont accessibles qu’après l’exécution du JavaScript et l’authentification ; Playwright a donc été retenu pour piloter un navigateur. Le volume maximal et le délai entre les actions de navigation sont configurables afin de limiter la charge et de rendre la collecte reproductible.
-
-> **À vérifier dans le dépôt :** les quatre tris et la réutilisation de session doivent être effectivement présents dans la version remise. Si une fonctionnalité n’est pas terminée, la retirer de ce résumé.
+Ce projet collecte les six produits constituant l’inventaire complet du site de démonstration Sauce Demo. Il ouvre une session avec les identifiants affichés par le site, puis réutilise l’état authentifié afin d’éviter une nouvelle connexion pour chaque page. La collecte couvre l’inventaire, les six pages de détail et les quatre ordres de tri demandés. Les données sont normalisées par le script de transformation, contrôlées par le script de validation, puis écrites dans un fichier JSONL à chaque exécution. La principale difficulté est que les produits ne sont accessibles qu’après l’exécution du JavaScript et l’authentification ; Playwright a donc été retenu pour piloter un navigateur. Le volume maximal et le délai entre les actions de navigation sont centralisés dans `config.py` afin de limiter la charge et de rendre la collecte reproductible.
 
 ## 2. Diagnostic de la cible
 
@@ -30,19 +27,19 @@ Le projet Python collecte les six produits constituant l’inventaire complet du
 
 Le périmètre est limité à Sauce Demo : page de connexion, inventaire complet de six produits, quatre ordres de tri et six pages de détail. Les identifiants utilisés sont les identifiants de démonstration affichés publiquement sur la page de connexion ; aucun mécanisme de protection n’est contourné. Le volume de produits est plafonné par `MAX_PRODUCTS` et le délai entre deux actions de navigation est configurable. La concurrence maximale retenue est de 1 : les navigations sont exécutées successivement dans un seul flux Playwright.
 
-Le fichier `robots.txt`, l’absence de conditions générales d’utilisation et l’absence de politique de confidentialité ont été examinés dans la fiche cible. **[RECOPIER ICI la règle exacte observée dans `robots.txt`, son URL, la date de consultation et la conclusion applicable aux chemins collectés.]** Aucun `Crawl-delay` n’a été observé **[À CONFIRMER]**. Le délai choisi est de **[VALEUR RÉELLE] ms** entre deux actions de navigation.
+Le fichier `robots.txt` a été consulté à l’adresse `https://www.saucedemo.com/robots.txt` le 30/07/2026 lors de la fiche cible. La règle observée est `User-agent: *` avec `Disallow:` vide : les chemins collectés ne sont donc pas interdits par ce fichier. Aucun `Crawl-delay` n’a été observé. En l’absence de délai publié, le projet applique une concurrence maximale de 1 et un délai de 500 ms entre deux actions de navigation. Aucune condition générale d’utilisation ni politique de confidentialité propre à Sauce Demo n’a été trouvée lors du diagnostic ; la collecte reste limitée aux six produits de démonstration et ne porte sur aucune donnée personnelle.
 
 ### 2.2 HTML, SPA, API ou combinaison
 
-| Élément                         | Observation / preuve                                                                                                                                                                      |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| HTML initial                      | Un simple`GET` ne fournit pas l’inventaire exploitable tel qu’il apparaît après connexion. **[Ajouter le nombre de caractères et l’absence d’un nom de produit précis.]** |
-| DOM après rendu                  | Après exécution du JavaScript et authentification, le DOM contient les six cartes produit.**[Ajouter le compteur réellement observé.]**                                         |
-| Requête(s) réseau utile(s)      | Aucune API publique stable n’a été retenue pour l’acquisition ; les données sont lues dans le DOM rendu.**[Confirmer avec l’onglet Réseau.]**                                |
-| Pagination, défilement ou filtre | Aucune pagination : l’inventaire complet contient six produits sur une page. Quatre tris sont disponibles dans la liste déroulante.                                                     |
-| Décision d’acquisition          | Playwright, car la navigation, l’authentification et l’exécution du JavaScript sont nécessaires.                                                                                      |
+| Élément                         | Observation / preuve                                                                                                                                                                                                                     |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HTML initial                      | Un simple`GET` sur `https://www.saucedemo.com/` renvoie un HTML de 1349 caractères avec un conteneur `<div id="root"></div>`. Le nom `Sauce Labs Backpack` y apparaît 0 fois.                                                  |
+| DOM après rendu                  | Après exécution du JavaScript et authentification, le DOM contient les six cartes produit attendues :`check_session.py` affiche `Produits visibles : 6`.                                                                           |
+| Requête(s) réseau utile(s)      | Aucune API publique stable n’a été retenue pour l’acquisition ; d’après le diagnostic réseau de la fiche cible, aucun appel Fetch/XHR exploitable ne fournit les données produit. Les données sont donc lues dans le DOM rendu. |
+| Pagination, défilement ou filtre | Aucune pagination : l’inventaire complet contient six produits sur une page. Quatre tris sont disponibles dans la liste déroulante.                                                                                                    |
+| Décision d’acquisition          | Playwright, car la navigation, l’authentification et l’exécution du JavaScript sont nécessaires.                                                                                                                                     |
 
-Le diagnostic confirme l’indication de la fiche cible : le contenu produit est absent du HTML initial exploitable et devient disponible dans le DOM après exécution du JavaScript et connexion. **[Ne cocher “conforme” qu’après avoir ajouté la preuve chiffrée.]**
+Le diagnostic confirme l’indication de la fiche cible : le contenu produit est absent du HTML initial exploitable et devient disponible dans le DOM après exécution du JavaScript et connexion.
 
 ## 3. Objet et modèle de données
 
@@ -72,33 +69,36 @@ flowchart TD
     E --> F["Export et traces"]
 ```
 
-| Composant                                                  | Responsabilité                                     | Entrée                        | Sortie                                |
-| ---------------------------------------------------------- | --------------------------------------------------- | ------------------------------ | ------------------------------------- |
-| `config.py`                                              | Centraliser chemins, plafond et délai              | Variables de configuration     | Constantes utilisées par les scripts |
-| Script de connexion**[nom à confirmer]**                  | Ouvrir la session et conserver l’état connecté   | Identifiants de démonstration | Contexte ou état authentifié        |
-| Script d’inventaire**[nom à confirmer]**                 | Collecter les liens et les ordres de tri            | Page inventaire                | Références de produits              |
-| `scrape_details.py`                                      | Visiter les pages de détail et extraire les champs | URLs produit                   | Données brutes                       |
-| Fichier du modèle`Product` **[nom à confirmer]** | Normaliser et valider                               | Dictionnaire brut              | Objet`Product` valide ou erreur     |
-| Export / vérification**[nom à confirmer]**               | Écrire le résultat et contrôler sa cohérence    | Produits validés              | Fichier final et compteurs            |
+| Composant                 | Responsabilité                                         | Entrée                                | Sortie                                                |
+| ------------------------- | ------------------------------------------------------- | -------------------------------------- | ----------------------------------------------------- |
+| `config.py`             | Centraliser les constantes, les chemins et le délai    | Valeurs définies dans le fichier      | Constantes utilisées par les scripts                 |
+| `login.py`              | Ouvrir une session authentifiée avec Playwright        | Identifiants exportés depuis`.env`  | `data/state/saucedemo_state.json`                   |
+| `check_session.py`      | Vérifier que la session sauvegardée est réutilisable | État de session Playwright            | Compteur de produits visible dans le terminal         |
+| `scrape_products.py`    | Collecter les produits visibles dans l’inventaire      | Page inventaire authentifiée          | `data/raw/products.json`                            |
+| `scrape_details.py`     | Visiter les six pages détail et extraire les champs    | `data/raw/products.json`             | `data/raw/product_details.json`                     |
+| `scrape_sorts.py`       | Relever les quatre ordres de tri de l’inventaire       | Page inventaire authentifiée          | `data/raw/product_sorts.json`                       |
+| `transform_products.py` | Fusionner, normaliser et exporter les données finales  | Données brutes inventaire et détails | `data/staging/products.json` et `products.jsonl`  |
+| `validate_products.py`  | Contrôler la structure et la cohérence des produits   | `data/staging/products.json`         | Validation Pydantic et messages de contrôle terminal |
 
 ## 5. Ancrage des sélecteurs
 
-| Champ | Ancrage retenu                                                              | Pourquoi plus stable que…                                                                                              | Si l’ancrage disparaît                                                                  |
-| ----- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Nom   | Attribut`data-test` du titre produit **[valeur exacte à relever]** | Il décrit le rôle de l’élément dans les tests du site ; une classe CSS peut changer pour une modification visuelle | L’extraction doit échouer explicitement ou la validation Pydantic rejette le nom absent |
-| Prix  | Attribut`data-test` du prix **[valeur exacte à relever]**          | Il cible directement la donnée, contrairement à un chemin DOM fondé sur la position                                  | L’objet est rejeté car`price` est obligatoire et strictement positif                  |
+| Champ           | Ancrage retenu                       | Pourquoi plus stable que…                                                                                                                                                                  | Si l’ancrage disparaît                                                                                                                                                                                                     |
+| --------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nom du produit  | `data-test="inventory-item-name"`  | Il cible directement le titre du produit dans le DOM rendu, contrairement à une classe CSS ou à une position dans la carte produit qui peuvent changer lors d’une modification visuelle. | Le script lève une`ValueError` explicite indiquant que l’ancrage du champ `name` est introuvable, avec le `data-test` attendu et la position du produit ou le nom de la fiche concernée.                            |
+| Prix du produit | `data-test="inventory-item-price"` | Il cible directement la valeur affichée du prix, sans dépendre de la structure HTML autour du produit.                                                                                    | Le script lève une`ValueError` explicite indiquant que l’ancrage du champ `price` est introuvable. Si l’ancrage existe mais que la valeur est invalide, la normalisation ou la validation rejette ensuite le produit. |
 
-Les attributs `data-test` ne constituent pas un contrat public : ils sont seulement jugés moins fragiles que les classes de présentation observées sur cette page.
+Pour les actions de connexion, le script privilégie aussi les sélecteurs accessibles quand ils existent, par exemple `get_by_role("button", name="Login")` pour le bouton de soumission. Les attributs `data-test` restent utilisés pour les champs produit, car ils identifient directement les données collectées dans Sauce Demo.
 
 ## 6. Choix des outils
 
-| Besoin                | Outil retenu                                           | Pourquoi                                                                                          | Alternative envisagée | Pourquoi écartée                                                                    |
-| --------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------- |
-| Acquisition           | Playwright Python, API**[synchrone à confirmer]**     | Exécute JavaScript, remplit le formulaire et conserve la session                                 | `httpx`              | Un simple client HTTP ne reproduit pas directement le parcours navigateur nécessaire |
-| Extraction            | Locators Playwright                                    | Interroge le DOM rendu et permet d’attendre les éléments                                       | BeautifulSoup seule    | Ne rend pas JavaScript et ne gère pas la connexion interactive                       |
-| Modèle et validation | Pydantic                                               | Types, contraintes et rejet des champs supplémentaires                                           | Dictionnaires Python   | Ne garantissent pas seuls la structure finale                                         |
-| Vérification         | **[pytest ou script de contrôle à confirmer]** | Contrôles reproductibles                                                                         | Vérification manuelle | Moins reproductible et insuffisante pour les cas d’erreur                            |
-| Export                | JSONL                                                  | Format imposé ; un objet JSON autonome par ligne, facile à relire et à traiter progressivement | JSON classique ou CSV  | Non conformes au format de rendu demandé                                             |
+| Besoin                | Outil retenu                                      | Pourquoi                                                                                          | Alternative envisagée  | Pourquoi écartée                                                                    |
+| --------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------- |
+| Acquisition           | Playwright Python, API synchrone                  | Exécute JavaScript, remplit le formulaire et conserve la session                                 | `httpx`               | Un simple client HTTP ne reproduit pas directement le parcours navigateur nécessaire |
+| Extraction            | Locators Playwright                               | Interroge le DOM rendu, applique les tris et permet d’attendre les éléments                    | BeautifulSoup seule     | Ne rend pas JavaScript et ne gère pas la connexion interactive                       |
+| Transformation        | Script Python dédié (`transform_products.py`) | Fusionne inventaire et pages détail, normalise le prix et déduit la devise                      | Transformation manuelle | Moins reproductible et plus risquée en cas de relance                                |
+| Modèle et validation | Pydantic dans`validate_products.py`             | Types, contraintes, URL attendue, absence de doublons et rejet des champs supplémentaires        | Dictionnaires Python    | Ne garantissent pas seuls la structure finale                                         |
+| Vérification         | `make validate`                                 | Contrôle reproductible du fichier staging final                                                  | Vérification manuelle  | Moins reproductible et insuffisante pour les cas d’erreur                            |
+| Export                | JSONL généré par`transform_products.py`      | Format imposé ; un objet JSON autonome par ligne, facile à relire et à traiter progressivement | JSON classique ou CSV   | Non conformes au format de rendu demandé                                             |
 
 **Décision 1 — navigateur plutôt que client HTTP seul.** Le coût est un lancement plus lourd et une dépendance à Chromium, mais Playwright correspond au besoin observé : connexion, JavaScript et session. Employer `httpx` uniquement parce qu’il est asynchrone n’aurait pas résolu ce besoin.
 
@@ -108,72 +108,93 @@ Les attributs `data-test` ne constituent pas un contrat public : ils sont seulem
 
 > Les valeurs suivantes doivent provenir d’une exécution finale, pas d’une estimation.
 
-| Indicateur                     |                                                Valeur |
-| ------------------------------ | ----------------------------------------------------: |
-| Pages ou requêtes traitées   |                                **[À MESURER]** |
-| Objets vus                     | **[À MESURER ; attendu : 6 produits uniques]** |
-| Objets exportés dans le JSONL |                                **[À MESURER]** |
-| Objets rejetés                |                                **[À MESURER]** |
-| Doublons détectés            |                                **[À MESURER]** |
-| Champs obligatoires manquants  |                                **[À MESURER]** |
-| Durée de la collecte limitée |                                **[À MESURER]** |
-| Délai appliqué               |                     **[VALEUR CONFIGURÉE] ms** |
+| Indicateur                     |                                                                Valeur |
+| ------------------------------ | --------------------------------------------------------------------: |
+| Pages ou requêtes traitées   | `page de connexion, inventaire, 6 pages détail et 4 états de tri` |
+| Objets vus                     |                                                    6 produits uniques |
+| Objets exportés dans le JSONL |                          6 lignes dans`data/staging/products.jsonl` |
+| Objets rejetés                |                                        0 lors de l’exécution finale |
+| Doublons détectés            |                              0 nom, 0 URL et 0 identifiant en doublon |
+| Champs obligatoires manquants  |                                          0 après validation Pydantic |
+| Durée de la collecte limitée |                                              17,69 s pour`make all` |
+| Délai appliqué               |                                                                500 ms |
 
-Forme de vérification : **[cocher trois tests automatisés ou un script de contrôle exécutable]**.
+Forme de vérification : script de contrôle exécutable avec `make validate`.
 
-| # | Contrôle                                                                                                        | Résultat                |
-| -: | ---------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| 1 | Une page enregistrée produit le nombre attendu d’objets                                                        | **[À EXÉCUTER]** |
-| 2 | `"$29.99"` est normalisé en montant décimal `29.99` et devise `USD` **[à adapter au code réel]** | **[À EXÉCUTER]** |
-| 3 | Deux observations ayant le même`id` sont dédupliquées, ou un produit incomplet est rejeté                  | **[À EXÉCUTER]** |
+| # | Contrôle                                                                            | Résultat                                                           |
+| -: | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| 1 | `make all` recrée les fichiers bruts, le fichier staging et le JSONL final        | OK : 6 produits collectés, 6 pages détail, 4 tris, 6 lignes JSONL |
+| 2 | `"$29.99"` est normalisé en montant décimal `29.99` et devise `USD`          | OK :`Sauce Labs Backpack — 29.99 USD` dans `make validate`     |
+| 3 | `validate_products.py` contrôle les champs obligatoires et l’absence de doublons | OK :`Validation réussie : 6 produits valides`                    |
 
-Cas d’erreur géré : **[choisir un cas réellement présent dans le code et réellement testé : sélecteur absent, échec de connexion, produit invalide ou erreur réseau]**. Décrire précisément l’action du programme : arrêt explicite, rejet de l’objet, trace produite et éventuel code de sortie.
+Cas d’erreur géré : l’échec de connexion a été testé avec de mauvais identifiants. Le programme s’arrête avec un code de sortie 1 et lève une `RuntimeError` explicite : `Échec de la connexion : Epic sadface: Username and password do not match any user in this service`.
 
 ## 8. Reproductibilité
 
-Depuis un clone neuf, l’utilisateur doit installer la version de Python indiquée dans le projet, créer l’environnement virtuel, installer les dépendances puis installer le navigateur Playwright. Le `Makefile` ajouté au dépôt doit fournir les commandes principales **[recopier les cibles exactes]**. À chaque lancement, le résultat doit être écrit dans le fichier JSONL documenté dans le README. Les éventuels paramètres de volume et de délai doivent être documentés avec leurs valeurs par défaut. Les identifiants employés sont ceux de démonstration affichés par Sauce Demo ; aucun secret ne doit être versionné. La procédure exacte doit être rejouée dans un second dossier avant la remise.
-
-Exemple à adapter au dépôt réel :
+Le projet a été exécuté avec Python 3.10.12. Depuis un clone neuf, il faut créer un environnement virtuel, installer les dépendances Python, puis installer le navigateur Chromium utilisé par Playwright.
 
 ```bash
-make install
-playwright install chromium
-make run
-make check
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m playwright install chromium
 ```
+
+Les identifiants de démonstration ne sont pas versionnés. Ils doivent être placés dans un fichier `.env` local, à partir du modèle `.env.example` :
+
+```bash
+cp .env.example .env
+```
+
+Le fichier `.env` doit contenir :
+
+```bash
+export SAUCEDEMO_USERNAME=<identifiant_de_demo_saucedemo>
+export SAUCEDEMO_PASSWORD=<mot_de_passe_de_demo_saucedemo>
+```
+
+Les valeurs à renseigner sont celles affichées publiquement sur la page de connexion Sauce Demo.
+
+Les commandes principales sont fournies par le `Makefile` :
+
+```bash
+make login
+make check-session
+make scrape
+make transform
+make validate
+```
+
+La commande complète de lancement est :
+
+```bash
+make all
+```
+
+À chaque exécution complète, le résultat final est réécrit dans `data/staging/products.jsonl`. Les dépendances système à prévoir sont donc Python 3.10, `make` et le navigateur Chromium installé par Playwright.
 
 ## 9. Limites et amélioration prioritaire
 
 1. Le collecteur dépend des attributs `data-test`, du parcours de connexion et de la structure actuelle du DOM. Leur modification peut interrompre l’extraction.
-2. La collecte dépend du réseau et de la disponibilité de Sauce Demo ; les contrôles ne doivent donc pas dépendre uniquement d’une exécution en ligne.
+2. La collecte dépend du réseau et de la disponibilité de Sauce Demo ; la partie validation finale peut être rejouée hors ligne.
 3. La cible est volontairement limitée à six produits et à une seule devise. Le comportement sur un grand catalogue, une pagination ou plusieurs devises n’est pas démontré.
+4. La réutilisation de session dépend du fichier `data/state/saucedemo_state.json`. Si ce fichier est absent, expiré ou invalide, les scripts de collecte ne peuvent pas accéder directement à l’inventaire ; il faut relancer `make login`.
 
-Avec une demi-journée supplémentaire, la priorité serait d’ajouter ou de consolider trois contrôles hors réseau à partir de pages enregistrées. Ils permettraient de vérifier l’extraction, la normalisation du prix et le rejet ou la déduplication même si le site est indisponible ou modifié le jour de l’évaluation.
+Avec une demi-journée supplémentaire, il pourrait être intéressant d'ajouter des tests basés sur des pages sauvegardées pour vérifier l'extraction sans avoir accès au site le jour de l’évaluation.
 
 ## 10. Usage de l’IA
 
-| Élément                         | Réponse                                                                                                                                                              |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Outils IA utilisés               | ChatGPT                                                                                                                                                               |
-| Tâches confiées                 | Explication des notions du cours, relecture de code, aide au diagnostic, proposition de structure et rédaction du compte rendu                                       |
-| Vérifications réalisées        | Exécution locale du code, comparaison avec les sorties obtenues, contrôle des champs et correction des propositions ne correspondant pas au dépôt                 |
-| Proposition corrigée ou refusée | **[Indiquer un exemple réel, par exemple une proposition trop complexe ou une fonctionnalité absente du code.]**                                              |
-| Pourquoi                          | Le dépôt et les résultats d’exécution constituent la source de vérité ; une proposition d’IA ne doit pas être déclarée comme réalisée sans vérification |
+| Élément                         | Réponse                                                                                                                                                                                              |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Outils IA utilisés               | ChatGPT                                                                                                                                                                                               |
+| Tâches confiées                 | Explication de notions de cours, aide ponctuelle à la reformulation du compte rendu, explication de messages d’erreur et relecture de certaines parties du code.                                    |
+| Vérifications réalisées        | Les propositions conservées ont été comparées au code réellement présent dans le dépôt et testées localement.                                                                                |
+| Proposition corrigée ou refusée | Une proposition de remplacer le sélecteur accessible du bouton login par un`data-test` a été refusée, car le cours recommande de privilégier les sélecteurs par rôle lorsqu’ils existent. |
+| Pourquoi                          | Le code exécuté, les fichiers produits et les résultats locaux restent la source de vérité.                                                                                                      |
 
 Deux demandes significatives à déclarer :
 
-1. Aide à rendre le volume maximal et le délai entre navigations configurables.
-2. Relecture de l’architecture Playwright et explication du choix entre API synchrone et asynchrone.
-
-## 11. Préparation de l’oral
-
-**Message essentiel :** j’ai choisi Playwright à partir du diagnostic de la cible, puis j’ai limité et validé la collecte afin d’obtenir six produits propres sans me reconnecter à chaque page.
-
-**Extrait de code à expliquer :** le fichier contenant la réutilisation de session ou le modèle `Product` et ses validateurs, **[ajouter fichier et lignes après le dernier commit]**.
-
-**Panne à diagnostiquer :** un locator ne trouve plus le prix d’un produit. Vérifier successivement la connexion, l’URL, le DOM rendu, l’attente, la valeur de `data-test`, puis le comportement de validation.
-
-**Plan de secours si la démonstration échoue :** montrer un export final daté, les traces et compteurs d’une exécution réussie, puis exécuter les contrôles hors réseau sur les pages enregistrées.
+1. Demande d’aide pour diagnostiquer l’échec de `get_by_test_id()` : les éléments de Sauce Demo utilisent l’attribut `data-test`, tandis que Playwright recherche par défaut `data-testid`
+2. Demande d’aide pour corriger la transformation du prix brut, par exemple `"$29.99"`, afin d’obtenir un montant décimal validé par Pydantic et une devise `USD` séparée.
 
 ## Déclaration
 
@@ -185,38 +206,7 @@ Je déclare :
 - que je n’ai contourné aucun mécanisme de protection ni aucune interdiction du `robots.txt` ;
 - que le dépôt ne contient ni secret ni donnée personnelle.
 
-Nom : **[À COMPLÉTER]**
-Date : **[À COMPLÉTER]**
+Nom : DEMURE Aurélie
+Date : **31/07/2026**
 
 ---
-
-## Périmètre conseillé pour la remise
-
-Les livrables explicitement demandés sont :
-
-1. un dépôt Git public et accessible ;
-2. un projet Python fonctionnel ;
-3. un résultat écrit en JSONL à l’exécution ;
-4. un README présentant les spécificités techniques et précisant qu’il s’agit d’un travail individuel ;
-5. une fiche descriptive par site cible, selon le modèle du module 1 ;
-6. éventuellement une démonstration ou une présentation.
-
-Il n’est donc pas nécessaire d’ajouter une architecture industrielle artificielle. Pour remplir honnêtement la trame :
-
-- conserver les rubriques de diagnostic, modèle, sélecteurs, outils, résultats et reproductibilité ;
-- décrire l’architecture réellement présente, même si elle tient dans quelques fichiers ;
-- ne pas ajouter de base de données, de parallélisme, de reprise automatique complexe ou d’observabilité si ces éléments ne sont ni demandés ni déjà présents ;
-- écrire « non traité » lorsqu’une capacité n’existe pas ;
-- fournir surtout des preuves courtes : sorties, compteurs, commandes et renvois vers le code.
-
-### Vérification minimale avant remise
-
-- [ ] Le dépôt est public et s’ouvre en navigation privée.
-- [ ] Le README indique clairement qu’il s’agit d’un travail individuel.
-- [ ] Les commandes d’installation et de lancement fonctionnent depuis un clone neuf.
-- [ ] Une exécution recrée bien le fichier JSONL attendu.
-- [ ] Chaque ligne du fichier est un objet JSON valide.
-- [ ] Le fichier contient le nombre d’objets annoncé dans le compte rendu.
-- [ ] La fiche cible Sauce Demo est présente dans le dépôt.
-- [ ] Aucun mot de passe personnel, jeton ou secret n’est versionné.
-- [ ] Une sortie et des traces d’exécution sont disponibles en secours pour une éventuelle démonstration.

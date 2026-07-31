@@ -45,10 +45,10 @@ def main() -> None:
         page.goto(BASE_URL, wait_until="domcontentloaded")
 
         # Remplit le formulaire de connexion avec les identifiants exportes.
-        page.get_by_placeholder("Username").fill(USERNAME)
-        page.get_by_placeholder("Password").fill(PASSWORD)
+        page.get_by_test_id("username").fill(USERNAME)
+        page.get_by_test_id("password").fill(PASSWORD)
         page.get_by_role("button", name="Login").click()
-
+        
         # Verifie que la connexion a bien redirigé vers la page d'inventaire sinon lève une erreur en précisant la cause précise de l'erreur
         try:
             expect(page).to_have_url(
