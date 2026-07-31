@@ -1,7 +1,5 @@
 import json
 import re
-from datetime import datetime, timezone
-from urllib.parse import parse_qs, urlparse
 from playwright.sync_api import Locator, Page, expect, sync_playwright
 from config import (
     AVAILABLE_PRODUCTS,
@@ -49,19 +47,6 @@ def load_products() -> list[dict]:
     with PRODUCTS_PATH.open("r", encoding="utf-8") as file:
         return json.load(file)
 
-def extract_product_id(product_url: str) -> int:
-    """Extrait l'identifiant stable présent dans l'URL du produit."""
-
-    query_parameters = parse_qs(urlparse(product_url).query)
-    product_ids = query_parameters.get("id")
-
-    if not product_ids or not product_ids[0].isdigit():
-        raise ValueError(
-            f"Identifiant absent ou invalide dans l'URL : {product_url}"
-        )
-
-    return int(product_ids[0])
-
 def extract_product_detail(page: Page, product_name: str) -> dict:
     """Ouvre la fiche d'un produit et collecte ses données brutes."""
 
@@ -107,19 +92,14 @@ def extract_product_detail(page: Page, product_name: str) -> dict:
     # On vérifie que le contenu principal de la fiche est bien affiché.
     expect(name_element).to_be_visible()
 
-    product_url = page.url
-    collected_at = datetime.now(timezone.utc).isoformat()
-
     # Les données restent brutes à ce stade :
     # le prix conserve notamment son symbole "$".
     detail = {
-        "id": extract_product_id(product_url),
         "name": name_element.inner_text().strip(),
         "price": price_element.inner_text().strip(),
         "description": description_element.inner_text().strip(),
         # Contrairement au href "#", page.url contient l'URL réelle.
         "url": page.url,
-        "collected_at": collected_at,
     }
 
     # Retour à l'inventaire pour traiter le produit suivant.

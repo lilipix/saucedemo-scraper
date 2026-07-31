@@ -1,6 +1,8 @@
 import json
+from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 from config import (
     MAX_PRODUCTS,
@@ -67,6 +69,20 @@ def extract_currency(raw_price: str) -> str :
     )
 
 
+def extract_product_id(product_url: str) -> int:
+    """Extrait l'identifiant stable présent dans l'URL du produit."""
+
+    query_parameters = parse_qs(urlparse(product_url).query)
+    product_ids = query_parameters.get("id")
+
+    if not product_ids or not product_ids[0].isdigit():
+        raise ValueError(
+            f"Identifiant absent ou invalide dans l'URL : {product_url}"
+        )
+
+    return int(product_ids[0])
+
+
 def transform_products(
     raw_products: list[dict],
     product_details: list[dict],
@@ -90,19 +106,22 @@ def transform_products(
             raise ValueError(
                 f"Page détail absente pour : {product_name}"
             )
-        raw_price= detail["price"]
+        raw_price = detail["price"]
+        product_url = detail["url"]
+        collected_at = datetime.now(timezone.utc).isoformat()
+
         # La page détail fournit la véritable URL.
         # Le sort_order provient de l'ordre par défaut de l'inventaire.
         transformed_products.append(
             {
-                "id": detail["id"],
+                "id": extract_product_id(product_url),
                 "name": product_name,
                 "price": normalize_price(raw_price),
                 "currency": extract_currency(raw_price),
                 "description": detail["description"],
-                "url": detail["url"],
+                "url": product_url,
                 "sort_order": raw_product["sort_order"],
-                "collected_at": detail["collected_at"],
+                "collected_at": collected_at,
             }
         )
 

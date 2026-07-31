@@ -47,14 +47,14 @@ Objet principal : `Product`.
 
 | Champ            | Type                              | Obligatoire ? | Source                                      | Normalisation / règle d’absence                                       |
 | ---------------- | --------------------------------- | ------------: | ------------------------------------------- | ----------------------------------------------------------------------- |
-| `id`           | entier ≥ 0                       |           Oui | paramètre`id` de l’URL de détail       | Conversion en entier ; rejet si absent ou invalide                      |
+| `id`           | entier ≥ 0                       |           Oui | paramètre`id` de l’URL de détail       | Extrait pendant la transformation ; rejet si absent ou invalide          |
 | `name`         | chaîne non vide                  |           Oui | titre du produit                            | Suppression des espaces périphériques ; rejet si vide                 |
 | `price`        | `Decimal` positif, 2 décimales |           Oui | prix affiché                               | Retrait du symbole monétaire puis conversion en`Decimal`             |
-| `currency`     | chaîne                           |           Oui | symbole du prix                             | `$` converti en code devise **[confirmer la valeur : `USD`]** |
+| `currency`     | chaîne                           |           Oui | symbole du prix                             | `$` converti en code devise `USD` |
 | `description`  | chaîne non vide                  |           Oui | page de détail                             | Nettoyage des espaces ; rejet si vide                                   |
 | `url`          | URL HTTP valide                   |           Oui | URL de la page de détail                   | Validation par`HttpUrl`                                               |
 | `sort_order`   | entier de 1 à`MAX_PRODUCTS`    |           Oui | position du produit dans l’ordre collecté | Validation de l’intervalle                                             |
-| `collected_at` | date et heure                     |           Oui | généré lors de la collecte               | Sérialisation ISO 8601                                                 |
+| `collected_at` | date et heure                     |           Oui | généré lors de la transformation         | Sérialisation ISO 8601                                                 |
 
 L’identifiant stable est extrait du paramètre `id` de l’URL `inventory-item.html?id=…`. La déduplication doit utiliser cet identifiant : deux observations ayant le même `id` représentent le même produit, même si les tris modifient sa position. Une valeur absente provoque un échec d’extraction ou de validation ; une chaîne présente mais vide est également refusée pour les champs obligatoires. Le modèle Pydantic est configuré avec `extra="forbid"` afin de détecter les champs inattendus.
 
