@@ -28,6 +28,7 @@ RAW_PRODUCTS_PATH = Path("data/raw/products.json")
 RAW_DETAILS_PATH = Path("data/raw/product_details.json")
 RAW_SORTS_PATH = Path("data/raw/product_sorts.json")
 STAGING_PRODUCTS_PATH = Path("data/staging/products.json")
+STAGING_PRODUCTS_JSONL_PATH = Path("data/staging/products.jsonl")
 
 
 # Verifie que le nombre de produits demande reste coherent.

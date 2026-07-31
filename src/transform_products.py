@@ -7,11 +7,13 @@ from config import (
     RAW_DETAILS_PATH,
     RAW_PRODUCTS_PATH,
     STAGING_PRODUCTS_PATH,
+    STAGING_PRODUCTS_JSONL_PATH,
 )
 
 PRODUCTS_PATH = RAW_PRODUCTS_PATH
 DETAILS_PATH = RAW_DETAILS_PATH
 STAGING_PATH = STAGING_PRODUCTS_PATH
+STAGING_JSONL_PATH = STAGING_PRODUCTS_JSONL_PATH
 
 CURRENCIES_BY_SYMBOL = {
     "$": "USD",
@@ -108,7 +110,7 @@ def transform_products(
 
 
 def save_products(products: list[dict]) -> None:
-    """Enregistre les produits transformés dans staging."""
+    """Enregistre les produits transformés au format JSON."""
 
     STAGING_PATH.parent.mkdir(parents=True, exist_ok=True)
 
@@ -119,6 +121,17 @@ def save_products(products: list[dict]) -> None:
             ensure_ascii=False,
             indent=2,
         )
+
+
+def save_products_jsonl(products: list[dict]) -> None:
+    """Enregistre un produit JSON par ligne dans le fichier JSONL."""
+
+    STAGING_JSONL_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    with STAGING_JSONL_PATH.open("w", encoding="utf-8") as file:
+        for product in products:
+            json_line = json.dumps(product, ensure_ascii=False)
+            file.write(f"{json_line}\n")
 
 
 def main() -> None:
@@ -144,12 +157,14 @@ def main() -> None:
     )
 
     save_products(products)
+    save_products_jsonl(products)
 
     for product in products:
         print(product)
 
     print(f"\nProduits transformés : {len(products)}")
     print(f"Données enregistrées dans : {STAGING_PATH}")
+    print(f"Données JSONL enregistrées dans : {STAGING_JSONL_PATH}")
 
 
 if __name__ == "__main__":
