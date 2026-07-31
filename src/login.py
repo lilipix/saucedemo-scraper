@@ -33,8 +33,6 @@ def main() -> None:
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     with sync_playwright() as playwright:
-        # Sauce Demo utilise data-test et non data-testid. On indique donc
-        # a Playwright quel attribut utiliser avec get_by_test_id.
         playwright.selectors.set_test_id_attribute(TEST_ID_ATTRIBUTE)
 
         # Lance Chromium, cree un contexte de navigation, puis ouvre une page.
