@@ -53,12 +53,14 @@ Analyste .............. Aurélie Demure
 
             
    Fichiers publies ........ robots.txt : oui  les robots sont autorisés à parcourir toutes les pages
-   ..........................sitemap.xml : non
-   Nombre d URLs connues ... 12 URL : page de connexion, inventaire, 6 pages détail, panier et 3 pages de commande
+                             sitemap.xml : non
+   Nombre d URLs connues ... 12 URL : page de connexion, inventaire, 6 pages détail, panier et 3 pages
+                             de commande
 2. SURFACE PORTEUSE DE LA DONNEE
    HTML initial ............ non   (marqueur : Sauce Labs Backpack, occurrences : 0)
    DOM apres JS ............ oui, inventory_item présent dans Eléments
-   Appel reseau ............ aucun appel API observé dans Fetch/XHR après rechargement de la page et désactivation du cache pour les données Product
+   Appel reseau ............ aucun appel API observé dans Fetch/XHR après rechargement de la page et 
+                             désactivation du cache pour les données Product
    Format de reponse ....... HTML aucune réponse JSON, JSON-LD ou XML pour les données Product
    Champs disponibles ...... dans le DOM : name, price, description 
    Couverture du contrat ... champs Product manquants :  currency, url, sort_order
@@ -69,7 +71,8 @@ Analyste .............. Aurélie Demure
    Commande de reference ... curl -s https://www.saucedemo.com/inventory.html
    En-tetes necessaires .... aucun entête HTTP spécifique, authentification requise
    Pagination .............. aucune
-   Condition d arret ....... arrêt lorsque les 6 produits sont collectés et les 6 pages détail visitées et les 4 ordres de tri relevés
+   Condition d arret ....... arrêt lorsque les 6 produits sont collectés et les 6 pages détail visitées et 
+                             les 4 ordres de tri relevés
    Niveaux ecartes ......... Niveau 1 : aucun fichier publié
                              Niveau 2 : pas d'API publique
                              Niveau 3 : pas d'API interne

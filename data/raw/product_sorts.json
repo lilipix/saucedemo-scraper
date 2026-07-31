@@ -1,0 +1,146 @@
+[
+  {
+    "sort": "az",
+    "label": "Nom : A à Z",
+    "products": [
+      {
+        "name": "Sauce Labs Backpack",
+        "price": "$29.99",
+        "sort_order": 1
+      },
+      {
+        "name": "Sauce Labs Bike Light",
+        "price": "$9.99",
+        "sort_order": 2
+      },
+      {
+        "name": "Sauce Labs Bolt T-Shirt",
+        "price": "$15.99",
+        "sort_order": 3
+      },
+      {
+        "name": "Sauce Labs Fleece Jacket",
+        "price": "$49.99",
+        "sort_order": 4
+      },
+      {
+        "name": "Sauce Labs Onesie",
+        "price": "$7.99",
+        "sort_order": 5
+      },
+      {
+        "name": "Test.allTheThings() T-Shirt (Red)",
+        "price": "$15.99",
+        "sort_order": 6
+      }
+    ]
+  },
+  {
+    "sort": "za",
+    "label": "Nom : Z à A",
+    "products": [
+      {
+        "name": "Test.allTheThings() T-Shirt (Red)",
+        "price": "$15.99",
+        "sort_order": 1
+      },
+      {
+        "name": "Sauce Labs Onesie",
+        "price": "$7.99",
+        "sort_order": 2
+      },
+      {
+        "name": "Sauce Labs Fleece Jacket",
+        "price": "$49.99",
+        "sort_order": 3
+      },
+      {
+        "name": "Sauce Labs Bolt T-Shirt",
+        "price": "$15.99",
+        "sort_order": 4
+      },
+      {
+        "name": "Sauce Labs Bike Light",
+        "price": "$9.99",
+        "sort_order": 5
+      },
+      {
+        "name": "Sauce Labs Backpack",
+        "price": "$29.99",
+        "sort_order": 6
+      }
+    ]
+  },
+  {
+    "sort": "lohi",
+    "label": "Prix : croissant",
+    "products": [
+      {
+        "name": "Sauce Labs Onesie",
+        "price": "$7.99",
+        "sort_order": 1
+      },
+      {
+        "name": "Sauce Labs Bike Light",
+        "price": "$9.99",
+        "sort_order": 2
+      },
+      {
+        "name": "Sauce Labs Bolt T-Shirt",
+        "price": "$15.99",
+        "sort_order": 3
+      },
+      {
+        "name": "Test.allTheThings() T-Shirt (Red)",
+        "price": "$15.99",
+        "sort_order": 4
+      },
+      {
+        "name": "Sauce Labs Backpack",
+        "price": "$29.99",
+        "sort_order": 5
+      },
+      {
+        "name": "Sauce Labs Fleece Jacket",
+        "price": "$49.99",
+        "sort_order": 6
+      }
+    ]
+  },
+  {
+    "sort": "hilo",
+    "label": "Prix : décroissant",
+    "products": [
+      {
+        "name": "Sauce Labs Fleece Jacket",
+        "price": "$49.99",
+        "sort_order": 1
+      },
+      {
+        "name": "Sauce Labs Backpack",
+        "price": "$29.99",
+        "sort_order": 2
+      },
+      {
+        "name": "Sauce Labs Bolt T-Shirt",
+        "price": "$15.99",
+        "sort_order": 3
+      },
+      {
+        "name": "Test.allTheThings() T-Shirt (Red)",
+        "price": "$15.99",
+        "sort_order": 4
+      },
+      {
+        "name": "Sauce Labs Bike Light",
+        "price": "$9.99",
+        "sort_order": 5
+      },
+      {
+        "name": "Sauce Labs Onesie",
+        "price": "$7.99",
+        "sort_order": 6
+      }
+    ]
+  }
+]
