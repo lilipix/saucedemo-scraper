@@ -11,8 +11,8 @@
 | URL de départ                           | https://www.saucedemo.com/                                                          |
 | Cible basculée en cours de TP ?         | Non                                                                                 |
 | Dépôt GitHub public                    | [github.com/lilipix/saucedemo-scraper](https://github.com/lilipix/saucedemo-scraper) |
-| Hash complet du commit évalué          | **[À COMPLÉTER après le dernier commit]**                                  |
-| Date et heure d’envoi                   | **[À COMPLÉTER]**                                                           |
+| Hash complet du commit évalué          | 3cd641084c9eba0767712a3bb162893946b24fe4                                  |
+| Date et heure d’envoi                   | 31/07/2026 12:52                                                           |
 | Commande de lancement limité            | **make all**                                                                  |
 | Commande de vérification                | **make validate**                                                             |
 | Lien GitHub testé en navigation privée | **[x]**                                                                       |
