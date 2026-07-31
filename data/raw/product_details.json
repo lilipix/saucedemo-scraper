@@ -5,7 +5,7 @@
     "price": "$29.99",
     "description": "carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.",
     "url": "https://www.saucedemo.com/inventory-item.html?id=4",
-    "collected_at": "2026-07-30T16:37:51.224864+00:00"
+    "collected_at": "2026-07-31T08:37:53.237349+00:00"
   },
   {
     "id": 0,
@@ -13,7 +13,7 @@
     "price": "$9.99",
     "description": "A red light isn't the desired state in testing but it sure helps when riding your bike at night. Water-resistant with 3 lighting modes, 1 AAA battery included.",
     "url": "https://www.saucedemo.com/inventory-item.html?id=0",
-    "collected_at": "2026-07-30T16:37:51.298653+00:00"
+    "collected_at": "2026-07-31T08:37:53.798068+00:00"
   },
   {
     "id": 1,
@@ -21,7 +21,7 @@
     "price": "$15.99",
     "description": "Get your testing superhero on with the Sauce Labs bolt T-shirt. From American Apparel, 100% ringspun combed cotton, heather gray with red bolt.",
     "url": "https://www.saucedemo.com/inventory-item.html?id=1",
-    "collected_at": "2026-07-30T16:37:51.367907+00:00"
+    "collected_at": "2026-07-31T08:37:54.347775+00:00"
   },
   {
     "id": 5,
@@ -29,7 +29,7 @@
     "price": "$49.99",
     "description": "It's not every day that you come across a midweight quarter-zip fleece jacket capable of handling everything from a relaxing day outdoors to a busy day at the office.",
     "url": "https://www.saucedemo.com/inventory-item.html?id=5",
-    "collected_at": "2026-07-30T16:37:51.430808+00:00"
+    "collected_at": "2026-07-31T08:37:54.899280+00:00"
   },
   {
     "id": 2,
@@ -37,7 +37,7 @@
     "price": "$7.99",
     "description": "Rib snap infant onesie for the junior automation engineer in development. Reinforced 3-snap bottom closure, two-needle hemmed sleeved and bottom won't unravel.",
     "url": "https://www.saucedemo.com/inventory-item.html?id=2",
-    "collected_at": "2026-07-30T16:37:51.479362+00:00"
+    "collected_at": "2026-07-31T08:37:55.485112+00:00"
   },
   {
     "id": 3,
@@ -45,6 +45,6 @@
     "price": "$15.99",
     "description": "This classic Sauce Labs t-shirt is perfect to wear when cozying up to your keyboard to automate a few tests. Super-soft and comfy ringspun combed cotton.",
     "url": "https://www.saucedemo.com/inventory-item.html?id=3",
-    "collected_at": "2026-07-30T16:37:51.529057+00:00"
+    "collected_at": "2026-07-31T08:37:56.071242+00:00"
   }
 ]

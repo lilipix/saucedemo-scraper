@@ -30,28 +30,28 @@ def extract_products(page: Page) -> list[dict]:
     expect(cards).to_have_count(AVAILABLE_PRODUCTS)
 
     for sort_order, card in enumerate(cards.all()[:MAX_PRODUCTS], start=1):
-      name_element = card.get_by_test_id("inventory-item-name")
+        name_element = card.get_by_test_id("inventory-item-name")
 
-      # Le href est sur la balise <a> parente du nom
-      detail_link = name_element.locator("..")
-      relative_url = detail_link.get_attribute("href")
+        # Le href est sur la balise <a> parente du nom
+        detail_link = name_element.locator("..")
+        relative_url = detail_link.get_attribute("href")
 
-      if relative_url is None:
-          raise ValueError("URL de la page détail absente")
+        if relative_url is None:
+            raise ValueError("URL de la page détail absente")
 
-      products.append(
-          {
-              "name": name_element.inner_text().strip(),
-              "price": card.get_by_test_id(
-                "inventory-item-price"
-              ).inner_text().strip(),
-              "description": card.get_by_test_id(
-                  "inventory-item-desc"
-              ).inner_text().strip(),
-              "url": relative_url,
-              "sort_order": sort_order,
-          }
-      )
+        products.append(
+            {
+                "name": name_element.inner_text().strip(),
+                "price": card.get_by_test_id(
+                    "inventory-item-price"
+                ).inner_text().strip(),
+                "description": card.get_by_test_id(
+                    "inventory-item-desc"
+                ).inner_text().strip(),
+                "url": relative_url,
+                "sort_order": sort_order,
+            }
+        )
 
     return products
 

@@ -33,6 +33,7 @@ def main() -> None:
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     with sync_playwright() as playwright:
+        # Sauce demo utilise data-test et pas data-testid qui est recherché par défaut il faut le préciser
         playwright.selectors.set_test_id_attribute(TEST_ID_ATTRIBUTE)
 
         # Lance Chromium, cree un contexte de navigation, puis ouvre une page.
@@ -48,8 +49,22 @@ def main() -> None:
         page.get_by_placeholder("Password").fill(PASSWORD)
         page.get_by_role("button", name="Login").click()
 
-        # Verifie que la connexion a bien redirige vers la page d'inventaire.
-        expect(page).to_have_url(re.compile(r".*/inventory\.html"))
+        # Verifie que la connexion a bien redirigé vers la page d'inventaire sinon lève une erreur en précisant la cause précise de l'erreur
+        try:
+            expect(page).to_have_url(
+                re.compile(r".*/inventory\.html"),
+            )
+        except AssertionError as exc:
+            error = page.get_by_test_id("error")
+
+            if error.is_visible():
+                message = error.inner_text()
+            else:
+                message = "La page inventory.html n'a pas été atteinte."
+
+            raise RuntimeError(
+            f"Échec de la connexion : {message}"
+            ) from exc
 
         # Verifie que le nombre attendu de produits est visible.
         products = page.get_by_test_id("inventory-item")
